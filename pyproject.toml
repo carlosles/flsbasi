@@ -10,7 +10,7 @@ urls = {source = "https://github.com/carlosles/flsbasi"}
 dependencies = []
 dynamic = ["version", "description"]
 [project.optional-dependencies]
-test = []  #"pytest", "pytest-cov"
+test = ["hypothesis", "pytest"]  #"pytest-cov"
 dev = [
     "pre-commit",
     "isort",
