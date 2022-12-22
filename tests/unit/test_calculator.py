@@ -10,7 +10,7 @@ def test_interpret_operators(x: int, y: int, op: str) -> None:
     if op == '+':
         assert interpret(text) == x + y
     elif op == '-':
-        assert interpret(text) == y - y
+        assert interpret(text) == x - y
     else:
         raise ValueError(f'unexpected operator "{op}"')
 
@@ -21,7 +21,7 @@ def test_interpret_with_whitespaces(x: int, y: int, op: str) -> None:
     if op == '+':
         assert interpret(text) == x + y
     elif op == '-':
-        assert interpret(text) == y - y
+        assert interpret(text) == x - y
     else:
         raise ValueError(f'unexpected operator "{op}"')
 
@@ -32,6 +32,6 @@ def test_interpret_with_multidigit_ints(x: int, y: int, op: str) -> None:
     if op == '+':
         assert interpret(text) == x + y
     elif op == '-':
-        assert interpret(text) == y - y
+        assert interpret(text) == x - y
     else:
         raise ValueError(f'unexpected operator "{op}"')
