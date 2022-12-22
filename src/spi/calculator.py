@@ -64,7 +64,7 @@ def tokenize(text: str) -> Iterator[Token]:
     """Lexically analyze (also known as scan or tokenize) input sentence."""
     digits: list[str] = []
     for char, next_char in pairwise(text + ' '):
-        if char == ' ':
+        if char.isspace():
             continue
         elif char.isdigit():
             digits += char
