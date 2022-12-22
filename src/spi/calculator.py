@@ -62,7 +62,9 @@ def eat(tokens: Iterator[Token], *token_types: TokenType) -> Token:
 def tokenize(text: str) -> Iterator[Token]:
     """Lexically analyze (also known as scan or tokenize) input sentence."""
     for char in text:
-        if char.isdigit():
+        if char == ' ':
+            continue
+        elif char.isdigit():
             yield Token(TokenType.INTEGER, int(char))
         elif char == '+':
             yield Token(TokenType.PLUS, char)
