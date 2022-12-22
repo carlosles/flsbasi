@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from dataclasses import dataclass
 from enum import Enum
-from itertools import repeat
+from itertools import pairwise, repeat
 
 
 class TokenType(Enum):
@@ -31,9 +31,10 @@ class Token:
 def interpret(text: str) -> int:
     """Evaluate expression from input sentence.
 
-    Expression can only be of the forms:
-    <int>+<int>
-    <int>-<int>
+    Expression can be of the form:
+    <int> + <int>
+    <int> - <int>
+    where <int> represents any non-negative integer.
     """
     tokens = tokenize(text)
 
@@ -61,11 +62,15 @@ def eat(tokens: Iterator[Token], *token_types: TokenType) -> Token:
 
 def tokenize(text: str) -> Iterator[Token]:
     """Lexically analyze (also known as scan or tokenize) input sentence."""
-    for char in text:
+    digits: list[str] = []
+    for char, next_char in pairwise(text + ' '):
         if char == ' ':
             continue
         elif char.isdigit():
-            yield Token(TokenType.INTEGER, int(char))
+            digits += char
+            if not next_char.isdigit():
+                yield Token(TokenType.INTEGER, int(''.join(digits)))
+                digits = []
         elif char == '+':
             yield Token(TokenType.PLUS, char)
         elif char == '-':
