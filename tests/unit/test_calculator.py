@@ -1,25 +1,37 @@
-import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
 from spi.calculator import interpret
 
 
-@given(st.integers(0, 9), st.integers(0, 9))
-def test_interpret(x: int, y: int) -> None:
-    text = f'{x}+{y}'
-    assert interpret(text) == x + y
+@given(st.integers(0, 9), st.integers(0, 9), st.sampled_from(['+', '-']))
+def test_interpret_operators(x: int, y: int, op: str) -> None:
+    text = f'{x}{op}{y}'
+    if op == '+':
+        assert interpret(text) == x + y
+    elif op == '-':
+        assert interpret(text) == x - y
+    else:
+        raise ValueError(f'unexpected operator "{op}"')
 
 
-@given(st.integers(min_value=10), st.integers(0, 9))
-def test_interpret_raises_error_tokenizing_digit(x: int, y: int):
-    text = f'{x}+{y}'
-    with pytest.raises(ValueError):
-        interpret(text)
+@given(st.integers(0, 9), st.integers(0, 9), st.sampled_from(['+', '-']))
+def test_interpret_with_whitespaces(x: int, y: int, op: str) -> None:
+    text = f'{x} {op}  {y}'
+    if op == '+':
+        assert interpret(text) == x + y
+    elif op == '-':
+        assert interpret(text) == x - y
+    else:
+        raise ValueError(f'unexpected operator "{op}"')
 
 
-@given(st.integers(0, 9), st.integers(0, 9))
-def test_interpret_raises_error_tokenizing_operator(x: int, y: int):
-    text = f'{x}-{y}'
-    with pytest.raises(ValueError):
-        interpret(text)
+@given(st.integers(min_value=10), st.integers(min_value=0), st.sampled_from(['+', '-']))
+def test_interpret_with_multidigit_ints(x: int, y: int, op: str) -> None:
+    text = f'{x}{op}{y}'
+    if op == '+':
+        assert interpret(text) == x + y
+    elif op == '-':
+        assert interpret(text) == x - y
+    else:
+        raise ValueError(f'unexpected operator "{op}"')
