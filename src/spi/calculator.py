@@ -38,17 +38,19 @@ def interpret(text: str) -> int:
     """
     tokens = tokenize(text)
 
-    left = eat(tokens, TokenType.INTEGER).value
-    operator = eat(tokens, TokenType.PLUS, TokenType.MINUS)
-    right = eat(tokens, TokenType.INTEGER).value
-
-    assert isinstance(left, int)
-    assert isinstance(right, int)
-    if operator.type is TokenType.PLUS:
-        return left + right
-    elif operator.type is TokenType.MINUS:
-        return left - right
-    raise TypeError(f'invalid operator token type {operator.type}')
+    result = eat(tokens, TokenType.INTEGER).value
+    assert isinstance(result, int)
+    ops_and_eof = (TokenType.PLUS, TokenType.MINUS, TokenType.EOF)
+    while (operator_type := eat(tokens, *ops_and_eof).type) is not TokenType.EOF:
+        integer = eat(tokens, TokenType.INTEGER).value
+        assert isinstance(integer, int)
+        if operator_type is TokenType.PLUS:
+            result += integer
+        elif operator_type is TokenType.MINUS:
+            result -= integer
+        else:
+            raise TypeError(f'invalid operator token type {operator_type}')
+    return result
 
 
 def eat(tokens: Iterator[Token], *token_types: TokenType) -> Token:
