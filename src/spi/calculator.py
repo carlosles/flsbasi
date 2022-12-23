@@ -8,6 +8,8 @@ class TokenType(Enum):
     INTEGER = 'INTEGER'
     PLUS = 'PLUS'
     MINUS = 'MINUS'
+    MUL = 'MUL'
+    DIV = 'DIV'
     EOF = 'EOF'  # end-of-file
 
 
@@ -16,7 +18,7 @@ class Token:
     """Token container.
 
     :param type: Type of token.
-    :param value: Value of token, must be in {0, 1, 2, ..., 9, '+', '-', None}.
+    :param value: Value of token, must be in {0, 1, 2, ..., 9, '+', '-', '*', '/', None}.
     """
 
     type: TokenType
@@ -34,20 +36,27 @@ def interpret(text: str) -> int:
     Expression can be of the form:
     <int> + <int>
     <int> - <int>
+    <int> * <int>
+    <int> / <int>
     where <int> represents any non-negative integer.
     """
     tokens = tokenize(text)
 
     left = eat(tokens, TokenType.INTEGER).value
-    operator = eat(tokens, TokenType.PLUS, TokenType.MINUS)
+    operator = eat(tokens, TokenType.PLUS, TokenType.MINUS, TokenType.MUL, TokenType.DIV)
     right = eat(tokens, TokenType.INTEGER).value
 
     assert isinstance(left, int)
     assert isinstance(right, int)
-    if operator.type is TokenType.PLUS:
-        return left + right
-    elif operator.type is TokenType.MINUS:
-        return left - right
+    match operator.type:
+        case TokenType.PLUS:
+            return left + right
+        case TokenType.MINUS:
+            return left - right
+        case TokenType.MUL:
+            return left * right
+        case TokenType.DIV:
+            return left // right
     raise TypeError(f'invalid operator token type {operator.type}')
 
 
@@ -75,6 +84,10 @@ def tokenize(text: str) -> Iterator[Token]:
             yield Token(TokenType.PLUS, char)
         elif char == '-':
             yield Token(TokenType.MINUS, char)
+        elif char == '*':
+            yield Token(TokenType.MUL, char)
+        elif char == '/':
+            yield Token(TokenType.DIV, char)
         else:
             raise ValueError('error parsing input')
     yield from repeat(Token(TokenType.EOF, None))
