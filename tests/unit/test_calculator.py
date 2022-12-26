@@ -10,10 +10,14 @@ def test_interpret_single_integer(x: int) -> None:
     assert interpret(text) == x
 
 
-@given(st.integers(0), st.integers(1), st.sampled_from(['*', '/']))
+@given(st.integers(0), st.integers(1), st.sampled_from(['+', '-', '*', '/']))
 def test_interpret_integer_pair(x: int, y: int, op: str) -> None:
     text = f'{x} {op} {y}'
-    if op == '*':
+    if op == '+':
+        assert interpret(text) == x + y
+    elif op == '-':
+        assert interpret(text) == x - y
+    elif op == '*':
         assert interpret(text) == x * y
     elif op == '/':
         assert interpret(text) == x // y
@@ -21,7 +25,7 @@ def test_interpret_integer_pair(x: int, y: int, op: str) -> None:
         raise ValueError(f'unexpected operator "{op}"')
 
 
-@given(st.lists(st.integers(1), min_size=4, max_size=4))
-def test_interpret_four_integers(xs: list[int]) -> None:
-    text = f'{xs[0]} * {xs[1]} / {xs[2]} * {xs[3]}'
-    assert interpret(text) == xs[0] * xs[1] // xs[2] * xs[3]
+@given(st.lists(st.integers(1), min_size=5, max_size=5))
+def test_interpret_full_expression(xs: list[int]) -> None:
+    text = f'{xs[0]} + {xs[1]} * {xs[2]} - {xs[3]} / {xs[4]}'
+    assert interpret(text) == xs[0] + xs[1] * xs[2] - xs[3] // xs[4]
