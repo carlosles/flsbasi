@@ -34,7 +34,8 @@ def interpret(text: str) -> int:
     """Evaluate expression from input sentence.
 
     Expression can be of the following grammar:
-        expr: factor ((PLUS | MINUS | MUL | DIV) factor)*
+        expr: term ((PLUS | MINUS) term)*
+        term: factor ((MUL | DIV) factor)*
         factor: INTEGER
     where INTEGER represents any non-negative integer.
     """
