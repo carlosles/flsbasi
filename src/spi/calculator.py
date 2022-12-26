@@ -8,6 +8,8 @@ class TokenType(Enum):
     INTEGER = 'INTEGER'
     PLUS = 'PLUS'
     MINUS = 'MINUS'
+    MUL = 'MUL'
+    DIV = 'DIV'
     EOF = 'EOF'  # end-of-file
 
 
@@ -16,7 +18,7 @@ class Token:
     """Token container.
 
     :param type: Type of token.
-    :param value: Value of token, must be in {0, 1, 2, ..., 9, '+', '-', None}.
+    :param value: Value of token, must be in {0, 1, 2, ..., 9, '*', '/', None}.
     """
 
     type: TokenType
@@ -31,23 +33,23 @@ class Token:
 def interpret(text: str) -> int:
     """Evaluate expression from input sentence.
 
-    Expression can be of the form:
-    <int> + <int>
-    <int> - <int>
-    where <int> represents any non-negative integer.
+    Expression can be of the following grammar:
+    expr: factor ((MUL | DIV) factor)*
+    factor: INTEGER
+    where INTEGER represents any non-negative integer.
     """
     tokens = tokenize(text)
 
     result = eat(tokens, TokenType.INTEGER).value
     assert isinstance(result, int)
-    ops_and_eof = (TokenType.PLUS, TokenType.MINUS, TokenType.EOF)
+    ops_and_eof = (TokenType.MUL, TokenType.DIV, TokenType.EOF)
     while (operator_type := eat(tokens, *ops_and_eof).type) is not TokenType.EOF:
         integer = eat(tokens, TokenType.INTEGER).value
         assert isinstance(integer, int)
-        if operator_type is TokenType.PLUS:
-            result += integer
-        elif operator_type is TokenType.MINUS:
-            result -= integer
+        if operator_type is TokenType.MUL:
+            result *= integer
+        elif operator_type is TokenType.DIV:
+            result //= integer
         else:
             raise TypeError(f'invalid operator token type {operator_type}')
     return result
@@ -73,10 +75,10 @@ def tokenize(text: str) -> Iterator[Token]:
             if not next_char.isdigit():
                 yield Token(TokenType.INTEGER, int(''.join(digits)))
                 digits = []
-        elif char == '+':
-            yield Token(TokenType.PLUS, char)
-        elif char == '-':
-            yield Token(TokenType.MINUS, char)
+        elif char == '*':
+            yield Token(TokenType.MUL, char)
+        elif char == '/':
+            yield Token(TokenType.DIV, char)
         else:
             raise ValueError('error parsing input')
     yield from repeat(Token(TokenType.EOF, None))
