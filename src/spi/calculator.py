@@ -34,7 +34,7 @@ def interpret(text: str) -> int:
     """Evaluate expression from input sentence.
 
     Expression can be of the following grammar:
-        expr: factor ((MUL | DIV) factor)*
+        expr: factor ((PLUS | MINUS | MUL | DIV) factor)*
         factor: INTEGER
     where INTEGER represents any non-negative integer.
     """
@@ -42,11 +42,15 @@ def interpret(text: str) -> int:
 
     result = eat(tokens, TokenType.INTEGER).value
     assert isinstance(result, int)
-    ops_and_eof = (TokenType.MUL, TokenType.DIV, TokenType.EOF)
+    ops_and_eof = tuple(tt for tt in list(TokenType) if tt is not TokenType.INTEGER)
     while (operator_type := eat(tokens, *ops_and_eof).type) is not TokenType.EOF:
         integer = eat(tokens, TokenType.INTEGER).value
         assert isinstance(integer, int)
-        if operator_type is TokenType.MUL:
+        if operator_type is TokenType.PLUS:
+            result += integer
+        elif operator_type is TokenType.MINUS:
+            result -= integer
+        elif operator_type is TokenType.MUL:
             result *= integer
         elif operator_type is TokenType.DIV:
             result //= integer
@@ -75,12 +79,16 @@ def tokenize(text: str) -> Iterator[Token]:
             if not next_char.isdigit():
                 yield Token(TokenType.INTEGER, int(''.join(digits)))
                 digits = []
+        elif char == '+':
+            yield Token(TokenType.PLUS, char)
+        elif char == '-':
+            yield Token(TokenType.MINUS, char)
         elif char == '*':
             yield Token(TokenType.MUL, char)
         elif char == '/':
             yield Token(TokenType.DIV, char)
         else:
-            raise ValueError('error parsing input')
+            raise ValueError(f'error parsing input "{char}"')
     yield from repeat(Token(TokenType.EOF, None))
 
 
