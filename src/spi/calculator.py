@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from enum import Enum
 from itertools import pairwise, repeat
 
+from more_itertools import peekable
+
 
 class TokenType(Enum):
     INTEGER = 'INTEGER'
@@ -31,7 +33,13 @@ class Token:
 
 
 def interpret(text: str) -> int:
-    """Evaluate expression from input sentence.
+    """Analyse, parse and evaluate input arithmetic sentence."""
+    tokens = tokenize(text)
+    return expr(tokens)
+
+
+def expr(input_tokens: Iterator[Token]) -> int:
+    """Evaluate expression from stream of tokens.
 
     Expression can be of the following grammar:
         expr: term ((PLUS | MINUS) term)*
@@ -39,24 +47,50 @@ def interpret(text: str) -> int:
         factor: INTEGER
     where INTEGER represents any non-negative integer.
     """
-    tokens = tokenize(text)
-
-    result = eat(tokens, TokenType.INTEGER).value
-    assert isinstance(result, int)
-    ops_and_eof = tuple(tt for tt in list(TokenType) if tt is not TokenType.INTEGER)
-    while (operator_type := eat(tokens, *ops_and_eof).type) is not TokenType.EOF:
-        integer = eat(tokens, TokenType.INTEGER).value
-        assert isinstance(integer, int)
+    tokens = peekable(input_tokens)
+    ops = (TokenType.PLUS, TokenType.MINUS)
+    result = term(tokens)
+    while (operator_type := tokens.peek().type) in ops:
+        _ = eat(tokens, *ops)
         if operator_type is TokenType.PLUS:
-            result += integer
+            result += term(tokens)
         elif operator_type is TokenType.MINUS:
-            result -= integer
-        elif operator_type is TokenType.MUL:
-            result *= integer
-        elif operator_type is TokenType.DIV:
-            result //= integer
+            result -= term(tokens)
         else:
             raise TypeError(f'invalid operator token type {operator_type}')
+    return result
+
+
+def term(tokens: peekable) -> int:
+    """Evaluate term from stream of tokens.
+
+    Term can be of the following grammar:
+        term: factor ((MUL | DIV) factor)*
+        factor: INTEGER
+    where INTEGER represents any non-negative integer.
+    """
+    ops = (TokenType.MUL, TokenType.DIV)
+    result = factor(tokens)
+    while (operator_type := tokens.peek().type) in ops:
+        _ = eat(tokens, *ops)
+        if operator_type is TokenType.MUL:
+            result *= factor(tokens)
+        elif operator_type is TokenType.DIV:
+            result //= factor(tokens)
+        else:
+            raise TypeError(f'invalid operator token type {operator_type}')
+    return result
+
+
+def factor(tokens: Iterator[Token]) -> int:
+    """Evaluate factor from stream of tokens.
+
+    Factor can be of the following grammar:
+        factor: INTEGER
+    where INTEGER represents any non-negative integer.
+    """
+    result = eat(tokens, TokenType.INTEGER).value
+    assert isinstance(result, int)
     return result
 
 
