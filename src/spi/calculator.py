@@ -18,7 +18,7 @@ class Token:
     """Token container.
 
     :param type: Type of token.
-    :param value: Value of token, must be in {0, 1, 2, ..., 9, '*', '/', None}.
+    :param value: Value of token, must be in {0, 1, 2, ..., '+', '-', '*', '/', None}.
     """
 
     type: TokenType
@@ -34,8 +34,8 @@ def interpret(text: str) -> int:
     """Evaluate expression from input sentence.
 
     Expression can be of the following grammar:
-    expr: factor ((MUL | DIV) factor)*
-    factor: INTEGER
+        expr: factor ((MUL | DIV) factor)*
+        factor: INTEGER
     where INTEGER represents any non-negative integer.
     """
     tokens = tokenize(text)
