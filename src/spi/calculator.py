@@ -20,7 +20,8 @@ class Token:
     """Token container.
 
     :param type: Type of token.
-    :param value: Value of token, must be in {0, 1, 2, ..., '+', '-', '*', '/', None}.
+    :param value: Value of token, must be in
+        {0, 1, 2, ..., '+', '-', '*', '/', '(', ')' None}.
     """
 
     type: TokenType
@@ -44,7 +45,7 @@ def expr(input_tokens: Iterator[Token]) -> int:
     Expression can be of the following grammar:
         expr: term ((PLUS | MINUS) term)*
         term: factor ((MUL | DIV) factor)*
-        factor: INTEGER
+        factor: INTEGER | LPAREN expr RPAREN
     where INTEGER represents any non-negative integer.
     """
     tokens = peekable(input_tokens)
@@ -66,7 +67,7 @@ def term(tokens: peekable) -> int:
 
     Term can be of the following grammar:
         term: factor ((MUL | DIV) factor)*
-        factor: INTEGER
+        factor: INTEGER | LPAREN expr RPAREN
     where INTEGER represents any non-negative integer.
     """
     ops = (TokenType.MUL, TokenType.DIV)
@@ -86,7 +87,7 @@ def factor(tokens: Iterator[Token]) -> int:
     """Evaluate factor from stream of tokens.
 
     Factor can be of the following grammar:
-        factor: INTEGER
+        factor: INTEGER | LPAREN expr RPAREN
     where INTEGER represents any non-negative integer.
     """
     result = eat(tokens, TokenType.INTEGER).value
