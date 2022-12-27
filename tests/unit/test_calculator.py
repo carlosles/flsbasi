@@ -29,3 +29,10 @@ def test_interpret_integer_pair(x: int, y: int, op: str) -> None:
 def test_interpret_full_expression(xs: list[int]) -> None:
     text = f'{xs[0]} + {xs[1]} * {xs[2]} - {xs[3]} / {xs[4]}'
     assert interpret(text) == xs[0] + xs[1] * xs[2] - xs[3] // xs[4]
+
+
+@given(st.lists(st.integers(1), min_size=7, max_size=7))
+def test_interpret_parenthesis_expression(xs: list[int]) -> None:
+    text = f'{xs[0]} + {xs[1]} * ({xs[2]} / ({xs[3]} / ({xs[4]} + {xs[5]}) - {xs[6]}))'
+    expected = xs[0] + xs[1] * (xs[2] // (xs[3] // (xs[4] + xs[5]) - xs[6]))
+    assert interpret(text) == expected
