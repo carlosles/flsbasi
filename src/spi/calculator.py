@@ -12,6 +12,8 @@ class TokenType(Enum):
     MINUS = 'MINUS'
     MUL = 'MUL'
     DIV = 'DIV'
+    LPAREN = 'LPAREN'
+    RPAREN = 'RPAREN'
     EOF = 'EOF'  # end-of-file
 
 
@@ -36,10 +38,10 @@ class Token:
 def interpret(text: str) -> int:
     """Analyse, parse and evaluate input arithmetic sentence."""
     tokens = tokenize(text)
-    return expr(tokens)
+    return expr(peekable(tokens))
 
 
-def expr(input_tokens: Iterator[Token]) -> int:
+def expr(tokens: peekable) -> int:
     """Evaluate expression from stream of tokens.
 
     Expression can be of the following grammar:
@@ -48,7 +50,6 @@ def expr(input_tokens: Iterator[Token]) -> int:
         factor: INTEGER | LPAREN expr RPAREN
     where INTEGER represents any non-negative integer.
     """
-    tokens = peekable(input_tokens)
     ops = (TokenType.PLUS, TokenType.MINUS)
     result = term(tokens)
     while (operator_type := tokens.peek().type) in ops:
@@ -90,9 +91,16 @@ def factor(tokens: Iterator[Token]) -> int:
         factor: INTEGER | LPAREN expr RPAREN
     where INTEGER represents any non-negative integer.
     """
-    result = eat(tokens, TokenType.INTEGER).value
-    assert isinstance(result, int)
-    return result
+    token = eat(tokens, TokenType.INTEGER, TokenType.LPAREN)
+    if token.type is TokenType.INTEGER:
+        result = token.value
+        assert isinstance(result, int)
+        return result
+    elif token.type is TokenType.LPAREN:
+        result = expr(tokens)
+        _ = eat(tokens, TokenType.RPAREN)
+        return result
+    raise TypeError(f'invalid token type {token.type}')
 
 
 def eat(tokens: Iterator[Token], *token_types: TokenType) -> Token:
@@ -123,6 +131,10 @@ def tokenize(text: str) -> Iterator[Token]:
             yield Token(TokenType.MUL, char)
         elif char == '/':
             yield Token(TokenType.DIV, char)
+        elif char == '(':
+            yield Token(TokenType.LPAREN, char)
+        elif char == ')':
+            yield Token(TokenType.RPAREN, char)
         else:
             raise ValueError(f'error parsing input "{char}"')
     yield from repeat(Token(TokenType.EOF, None))
