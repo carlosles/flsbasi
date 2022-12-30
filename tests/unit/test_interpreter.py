@@ -42,3 +42,13 @@ def test_interpret_parenthesis_expression(xs: list[int]) -> None:
         assert interpret(text) == expected
     except ZeroDivisionError:
         pass
+
+
+@given(st.lists(st.integers(4), min_size=4, max_size=4))
+def test_interpret_unary_operators(xs: list[int]) -> None:
+    text = f'{xs[0]} - - - + - ({xs[1]} + {xs[2]}) - +{xs[3]}'
+    expected = xs[0] + (xs[1] + xs[2]) - xs[3]
+    try:
+        assert interpret(text) == expected
+    except ZeroDivisionError:
+        pass

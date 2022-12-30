@@ -1,7 +1,7 @@
 from functools import singledispatch
 
 from spi import lexer, parser
-from spi.ast import AST, BinOp, Num
+from spi.ast import AST, BinOp, Num, UnaryOp
 from spi.token import TokenType
 
 
@@ -36,8 +36,17 @@ def _(node: BinOp) -> int:
             return evaluate(node.left) * evaluate(node.right)
         case TokenType.DIV:
             return evaluate(node.left) // evaluate(node.right)
-        case _:
-            raise ValueError(f'invalid token type {node.token.type}')
+    raise ValueError(f'invalid token type {node.token.type}')
+
+
+@evaluate.register
+def _(node: UnaryOp) -> int:
+    match node.token.type:
+        case TokenType.PLUS:
+            return evaluate(node.expr)
+        case TokenType.MINUS:
+            return -evaluate(node.expr)
+    raise ValueError(f'invalid token type {node.token.type}')
 
 
 def main() -> None:

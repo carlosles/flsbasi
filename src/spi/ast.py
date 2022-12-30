@@ -13,8 +13,14 @@ class BinOp:
 
 
 @dataclass
+class UnaryOp:
+    token: Token
+    expr: AST
+
+
+@dataclass
 class Num:
     token: Token
 
 
-AST = BinOp | Num
+AST = BinOp | UnaryOp | Num
