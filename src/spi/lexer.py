@@ -10,23 +10,24 @@ def tokenize(text: str) -> Iterator[Token]:
     for char, next_char in pairwise(text + ' '):
         if char.isspace():
             continue
-        elif char.isdigit():
-            digits += char
-            if not next_char.isdigit():
-                yield Token(TokenType.INTEGER, int(''.join(digits)))
-                digits = []
-        elif char == '+':
-            yield Token(TokenType.PLUS, char)
-        elif char == '-':
-            yield Token(TokenType.MINUS, char)
-        elif char == '*':
-            yield Token(TokenType.MUL, char)
-        elif char == '/':
-            yield Token(TokenType.DIV, char)
-        elif char == '(':
-            yield Token(TokenType.LPAREN, char)
-        elif char == ')':
-            yield Token(TokenType.RPAREN, char)
-        else:
-            raise ValueError(f'error parsing input "{char}"')
+        match char:
+            case c if c.isdigit():
+                digits += char
+                if not next_char.isdigit():
+                    yield Token(TokenType.INTEGER, int(''.join(digits)))
+                    digits = []
+            case '+':
+                yield Token(TokenType.PLUS, char)
+            case '-':
+                yield Token(TokenType.MINUS, char)
+            case '*':
+                yield Token(TokenType.MUL, char)
+            case '/':
+                yield Token(TokenType.DIV, char)
+            case '(':
+                yield Token(TokenType.LPAREN, char)
+            case ')':
+                yield Token(TokenType.RPAREN, char)
+            case _:
+                raise ValueError(f'error parsing input "{char}"')
     yield from repeat(Token(TokenType.EOF, None))
