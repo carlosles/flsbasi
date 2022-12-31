@@ -1,6 +1,9 @@
+from importlib.resources import files
+
 from hypothesis import given
 from hypothesis import strategies as st
 
+import tests.data
 from spi.interpreter import interpret
 
 
@@ -52,3 +55,12 @@ def test_interpret_unary_operators(xs: list[int]) -> None:
         assert interpret(text) == expected
     except ZeroDivisionError:
         pass
+
+
+def test_interpret_program() -> None:
+    text = files(tests.data).joinpath('program.txt').read_text()
+    result = interpret(text)
+    assert result['number'] == 2
+    assert result['a'] == 2
+    assert result['b'] == 20
+    assert result['c'] == 22
