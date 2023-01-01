@@ -40,8 +40,8 @@ def itokenize(chars: Iterator[str]) -> Iterator[Token]:
                 raise ValueError(f'error parsing input "{char + equal}"')
             yield Token(TokenType.ASSIGN, ':=')
         case c if c.isalpha():
-            letters, chars = before_and_after(str.isalpha, chars)
-            word = ''.join(chain(char, letters))
+            letters_nums, chars = before_and_after(str.isalnum, chars)
+            word = ''.join(chain(char, letters_nums))
             if word == 'BEGIN':
                 yield Token(TokenType.BEGIN, word)
             elif word == 'END':
