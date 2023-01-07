@@ -3,6 +3,12 @@ from enum import Enum
 
 
 class TokenType(Enum):
+    DOT = 'DOT'
+    BEGIN = 'BEGIN'
+    END = 'END'
+    SEMI = 'SEMI'
+    ASSIGN = 'ASSIGN'
+    ID = 'ID'
     INTEGER = 'INTEGER'
     PLUS = 'PLUS'
     MINUS = 'MINUS'
@@ -18,8 +24,7 @@ class Token:
     """Token container.
 
     :param type: Type of token.
-    :param value: Value of token, must be in
-        {0, 1, 2, ..., '+', '-', '*', '/', '(', ')' None}.
+    :param value: Value of token.
     """
 
     type: TokenType
