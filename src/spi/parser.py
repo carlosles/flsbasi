@@ -12,6 +12,34 @@ def parse(tokens: Iterator[Token]) -> AST:
     return expr(peekable(tokens))
 
 
+def program(tokens: Iterator[Token]) -> AST:
+    pass
+
+
+def compound_statement(tokens: Iterator[Token]) -> AST:
+    pass
+
+
+def statement_list(tokens: Iterator[Token]) -> AST:
+    pass
+
+
+def statement(tokens: Iterator[Token]) -> AST:
+    pass
+
+
+def assignment_statement(tokens: Iterator[Token]) -> AST:
+    pass
+
+
+def empty(tokens: Iterator[Token]) -> AST:
+    pass
+
+
+def variable(tokens: Iterator[Token]) -> AST:
+    pass
+
+
 def expr(tokens: peekable) -> AST:
     """Evaluate expression from stream of tokens.
 
